@@ -6,3 +6,5 @@
 - [条件语句if/switch](./condition.go)
 - [循环for](./circulation.go)
 - [函数](./function.go)
+- [指针](./pointer.go)
+- [数组](./arrays.go)
