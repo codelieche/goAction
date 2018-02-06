@@ -10,3 +10,4 @@
 - [数组](./arrays.go)
 - [切片](./slice.go)
 - [Map](./maps.go)
+- [字符和字符串的处理](./strings.go)
