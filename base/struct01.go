@@ -30,5 +30,7 @@ func main() {
 	p.setAge(30)
 	p.setName("codelieche.com")
 	p.info()
+
+	fmt.Println("p的名字：p.name: ", p.name)
 }
 

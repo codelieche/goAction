@@ -35,3 +35,16 @@ func (p *People)setName(name string){
 	p.name = name
 }
 ```
+
+### 封装
+- Go语言名字一般使用CamelCase，python常使用caml_case
+- 首字母大写：public
+- 首字母小写：private
+- 注意public/private是针对包来说的
+
+#### 包
+- 每个目录只能一个包【比如这个目录有了main包了，就不可加其它包了】
+- main包包含可执行入口
+- 为结构体定义的方法必须放在同一个包内
+- 可以是不同文件
+
