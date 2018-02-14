@@ -2,7 +2,8 @@
 切片
 slice本身是没有数据的，是对底层array的一个view
 slice可以向后扩展，但是不可以向前扩展
-s[i]其中i不可以超越len(s), 向后扩展不可以超越底层数组cap(s)
+s[i]其中i不可以超越len(s), 向后扩展不可以超越底层数组cap(s),
+s[a:b] 超过cap的值是会报错的：slice bounds out of range
 
 
 s2 := append(s1, 22)
