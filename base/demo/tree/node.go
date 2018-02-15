@@ -29,7 +29,7 @@ func (node *Node) Traverse() {
 }
 
 
-func createNode(value int) *Node {
+func CreateNode(value int) *Node {
 	node := Node{Value: value}
 	return &node
 }
