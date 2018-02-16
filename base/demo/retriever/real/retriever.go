@@ -12,7 +12,11 @@ type Retriever struct {
 	TimeOut   time.Duration
 }
 
+//func (r *Retriever) Get(url string) string {
+// 用指针方式实现
+
 func (r Retriever) Get(url string) string {
+	// 值接收者 实现
 	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)
