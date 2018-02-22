@@ -7,15 +7,46 @@ import (
 	"time"
 )
 
+const url = "http://www.codelieche.com"
+
 type Retriever interface {
 	// 在interface里面，不需要加func
 	// 里面本身就是函数
 	Get(url string) string
 }
 
+type Poster interface {
+	Post(url string, form map[string]string) string
+}
+
+type RetriverPoster interface {
+	// 组合接口
+	Retriever
+	Poster
+	// 还可以定义些其它的方法
+}
+
 func download(r Retriever) string {
 	// 使用者：download
-	return r.Get("http://www.codelieche.com")
+	return r.Get(url)
+}
+
+func post(poster Poster) {
+	poster.Post(url,
+		map[string]string{
+			"username": "codelieche",
+			"password": "abc123456",
+			"contents": "传输的内容",
+		})
+}
+
+func session(s RetriverPoster) string {
+	//s.Get(url)
+	s.Post(url, map[string]string{
+		"username": "abcd",
+		"contents": "This is Good!",
+	})
+	return s.Get(url)
 }
 
 func inspect(r Retriever) {
@@ -69,4 +100,8 @@ func main() {
 	fmt.Print("r2:\t")
 	typeAssert(r2)
 
+	fmt.Println("\n=== session ===")
+	//var r01 Retriever
+	//r01 = mock.Retriever{"good"}
+	//fmt.Println(session(r01))
 }
