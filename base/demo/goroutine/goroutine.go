@@ -15,7 +15,8 @@ func goroutineDemo() {
 		}(i)
 	}
 	// 延时一下，要不会立刻就执行完毕了
-	time.Sleep(5 * time.Microsecond)
+	time.Sleep(5 * time.Millisecond)
+	//time.Sleep(time.Minute)
 }
 
 func main() {
