@@ -1,5 +1,6 @@
 ## 接口（interface）
 
+
 ### 接口的定义
 
 ```go
@@ -30,4 +31,26 @@ func download(retriever Retriever) string {
 - Type Switch
 
 
+在Go语言中，只要两个接口拥有相同的方法列表，那么它们就是相同的，可以相互赋值。
+
+```go
+package one
+
+type ReadWrite interface {
+	Read(buf [] byte) (n int, err error)
+	Writer(buf [] byte)(n int, err error)
+}
+```
+
+第二个接口：
+```go
+package two
+type IStream interface {
+	Write(buf [] byte) (n int, err error)
+	Read(buf [] byte) (n int, err error)
+}
+```
+在这里我们定义了两个接口，一个叫one.ReadWriter, 一个叫two.IStream,两者都定义了Read()和Write()方法，  
+只是定义的次序相反。  
+在Go语言中，这两个接口实际上并无区别。
 
