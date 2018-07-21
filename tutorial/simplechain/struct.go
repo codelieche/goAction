@@ -35,3 +35,57 @@ func (b *Block) GeneraterNextBlock(data string) *Block {
 	return &nextBlock
 }
 
+// 区块链
+type BlockChain struct {
+	Blocks []*Block
+}
+
+func (bc *BlockChain) Append(b *Block) error {
+	// 往区块链中添加区块
+	if len(bc.Blocks) == 0 {
+		bc.Blocks = append(bc.Blocks, b)
+		return nil
+	}
+	// 添加前需要验证
+	if bc.isValid(b) {
+		bc.Blocks = append(bc.Blocks, b)
+		return nil
+	}else{
+		return fmt.Errorf("区块校验不通过")
+	}
+}
+
+func (bc *BlockChain) isValid(new *Block) bool {
+	old := *bc.Blocks[len(bc.Blocks) - 1]
+	if old.Index + 1 != new.Index {
+		return false
+	}
+	if old.Hash != old.PrevHash {
+		return false
+	}
+	if new.CalculateHash() != new.Hash {
+		return false
+	}
+	return true
+}
+
+func (bc *BlockChain) SendData(data string){
+
+	// 直接通过字符串，加入区块
+	prevBlock := bc.Blocks[len(bc.Blocks) - 1]
+	newBlock := prevBlock.GeneraterNextBlock(data)
+	bc.Blocks = append(bc.Blocks, newBlock)
+}
+
+func (bc *BlockChain) Print(){
+	for _, block := range bc.Blocks {
+		fmt.Printf("区块: %d\n", block.Index)
+		fmt.Printf("时间戳: %d\n", block.TimeStamp)
+		fmt.Printf("Hash: %s\n", block.Hash)
+		fmt.Printf("Data：%s\n", block.Data)
+		fmt.Println()
+	}
+}
+
+
+
