@@ -19,12 +19,10 @@ func Run() {
 	//log.Println(sesession, err)
 	// 获取列表
 	web := monitor.ListMonitorFromWeb{}
-	log.Println(web)
 
 	process := monitor.Process{
 		Source: &web,
 	}
-	log.Println(process.Source)
 	monitors, err := process.Source.List()
 	if err != nil {
 		log.Println("获取监控数据列表出错：", err.Error())

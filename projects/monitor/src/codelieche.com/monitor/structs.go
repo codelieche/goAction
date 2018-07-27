@@ -3,6 +3,8 @@ package monitor
 import (
 	"time"
 
+	"sync"
+
 	"codelieche.com/event"
 )
 
@@ -69,8 +71,12 @@ type Log struct {
 }
 
 type Process struct {
-	Source      Lister   // 监控列表的源【web监控列表/ 服务器监控列表 / 其它监控列表】
-	TaskExecute Executer // 任务执行器【需要用到Execute的方法】请与source一一对应
+	Source         Lister          // 监控列表的源【web监控列表/ 服务器监控列表 / 其它监控列表】
+	TaskExecute    Executer        // 任务执行器【需要用到Execute的方法】请与source一一对应
+	ExecuteInfoMap *ExecuteInfoMap // 任务执行信息
+	taskChan       chan Task       // 监控执行任务的channel
+	logsChan       chan Log        // 监控执行日志的channel
+
 }
 
 // 监控的任务
@@ -82,6 +88,14 @@ type Task struct {
 	//Execute      Executer  // 执行任务的接口
 }
 
+// 监控结果
+type Result struct {
+	Success  bool         // 成功
+	Event    *event.Event // 事件，当失败的时候需要创建事件
+	Executed bool         // 是否执行了，有些任务是过期了就不用执行了，这里会是false
+	Elapsed  float64      // 执行时间（请求时间合计）参考了py中的requests的模块命名
+}
+
 // 监控执行信息
 type ExecuteInfo struct {
 	IsOk            bool      // 当前监控是否正常(指监控的web服务是否正常)
@@ -91,10 +105,24 @@ type ExecuteInfo struct {
 	ErrorCount      int       // 出错次数，当监控的服务正常了后，重置为0
 }
 
-// 监控结果
-type Result struct {
-	Success  bool         // 成功
-	Event    *event.Event // 事件，当失败的时候需要创建事件
-	Executed bool         // 是否执行了，有些任务是过期了就不用执行了，这里会是false
-	Elapsed  float64      // 执行时间（请求时间合计）参考了py中的requests的模块命名
+// 监控执行信息映射：
+type ExecuteInfoMap struct {
+	Data *map[int]ExecuteInfo // 是个数组：[{id: info}]  id是监控的id，info是ExecuteInfo
+	Lock *sync.RWMutex        // 读写锁，因为需要对监控的执行信息读取与写入，所以需要加入这个
+}
+
+// 结构体的方法: 获取监控的执行信息
+func (info *ExecuteInfoMap) Get(k int) ExecuteInfo {
+	// 先设置个读锁
+	info.Lock.RLock()
+	d := (*info.Data)[k]
+	defer info.Lock.RUnlock() // 记得释放锁
+	return d
+}
+
+// 设置监控的执行信息
+func (info *ExecuteInfoMap) Set(k int, v ExecuteInfo) {
+	info.Lock.Lock()
+	(*info.Data)[k] = v
+	defer info.Lock.Unlock()
 }
