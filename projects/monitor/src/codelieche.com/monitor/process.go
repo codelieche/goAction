@@ -11,7 +11,8 @@ import (
 */
 func (process *Process) executeTask(task *Task) {
 	// 第1步：先判断这个任务是否过期
-	if task.ExecutedTime.Before(time.Now()) {
+	if task.ExpiredTime.Before(time.Now()) {
+		log.Println("任务过期时间，已经过了，无需执行")
 		return
 	}
 	// 第2步：如果执行时间在当前时间之后，需要先延时下
@@ -23,6 +24,7 @@ func (process *Process) executeTask(task *Task) {
 	result, err := process.TaskExecute.Execute(task)
 	if result == nil {
 		log.Println("执行任务结果返回空:", task.Monitor)
+		return
 	}
 
 	// 第4步：执行完毕，做相应的处理
@@ -69,7 +71,15 @@ func (process *Process) executeTask(task *Task) {
 				executeInfo.ErrorCount = 0
 
 				// 执行监控异常事件的：AutoFix操作
-
+				if result, err := process.EventHandle.AutoFix(task.Monitor); err != nil {
+					log.Println("执行自动修复出错:", err.Error())
+				} else {
+					if result.Status {
+						log.Println("执行自动修复成功：", result.Message)
+					} else {
+						log.Println("执行自动修复失败：", result.Message)
+					}
+				}
 			}
 		}
 	} else {
@@ -90,11 +100,20 @@ func (process *Process) executeTask(task *Task) {
 				message := fmt.Sprintf("%s(%d): 需要创建异常事件了", task.Monitor.Name, task.Monitor.Id)
 				log.Println(message)
 				// 创建异常事件
-				// TODO
+				// 执行监控返回的结果中有个Event对象的
+				if success, message := process.EventHandle.Report(result.Event); success {
+					// 创建异常事件成功
+					msg := fmt.Sprintf("%s(%d): 创建异常事件成功!", task.Monitor.Name, task.Monitor.Id)
+					log.Println(msg)
+				} else {
+					// 创建异常事件失败
+					log.Println("创建异常事件失败：", message)
+				}
 
 			}
 		} else {
 			// 未执行，那么就无需处理
+			return
 		}
 	}
 

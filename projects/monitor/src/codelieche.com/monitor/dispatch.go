@@ -14,9 +14,8 @@ func (process *Process) ExecuteMonitorTask() {
 	for {
 		//var task Task
 		//task <- process.TaskChan
-		log.Println("执行任务")
 		task := <-process.TaskChan
-		process.executeTask(&task)
+		go process.executeTask(&task)
 	}
 }
 
@@ -28,7 +27,7 @@ func (process *Process) ExecuteMonitorTask() {
 func (process *Process) RecordLog() {
 	for {
 		executeLog := <-process.LogChan
-		log.Println(executeLog)
+		log.Println("处理日志：", executeLog)
 	}
 }
 
@@ -73,7 +72,7 @@ func (process *Process) generateMonitorTask(m Monitor, nextFreshTime time.Time) 
 	now := time.Now()
 	executeInfo = process.ExecuteInfoMap.Get(monitorId)
 	if executeInfo.ExecuteTime.Year() < 2000 {
-		log.Println("第一次处理这个monitor")
+		//log.Println("第一次处理这个monitor")
 		// 设置执行信息
 		executeInfo = ExecuteInfo{
 			IsOk:            true,

@@ -21,3 +21,25 @@ type Lister interface {
 type Executer interface {
 	Execute(task *Task) (*Result, error)
 }
+
+// 报告事件
+type Reporter interface {
+	Report(event *Event) (bool, string)
+}
+
+/**
+事件相关的接口
+1. 报告监控事件
+2. 修复监控
+*/
+
+// 设置监控已经恢复
+type AutoFixer interface {
+	AutoFix(m *Monitor) (FixResponse, error)
+}
+
+// 事件相关的处理接口
+type Handler interface {
+	Reporter
+	AutoFixer
+}

@@ -4,8 +4,6 @@ import (
 	"time"
 
 	"sync"
-
-	"codelieche.com/event"
 )
 
 /*
@@ -71,13 +69,25 @@ type Log struct {
 	Success  bool      // 是否成功
 }
 
+type Event struct {
+	Monitor    int       `json:"monitor"` // 监控的ID
+	Title      string    `json:"title"`   // 事件的标题
+	Content    string    `json:"content"` // 事件内容
+	Level      int       `json: "level"`  // 事件级别，级别越高表示越严重
+	Status     string    `json:"status"`  // 状态：to-do, doing, autofixed
+	StatusCode int       // 状态码，数字，方便排序
+	Creator    string    // 事件的创建者
+	Handler    string    `json:"handler"` // 事件的处理者
+	TimeStart  time.Time // 事件开始时间
+}
+
 type Process struct {
 	Source         Lister          // 监控列表的源【web监控列表/ 服务器监控列表 / 其它监控列表】
 	TaskExecute    Executer        // 任务执行器【需要用到Execute的方法】请与source一一对应
 	ExecuteInfoMap *ExecuteInfoMap // 任务执行信息
 	TaskChan       chan Task       // 监控执行任务的channel
 	LogChan        chan Log        // 监控执行日志的channel
-
+	EventHandle    Handler         // 处理监控异常事件的操作
 }
 
 // 监控的任务
@@ -91,10 +101,10 @@ type Task struct {
 
 // 监控结果
 type Result struct {
-	Success  bool         // 成功
-	Event    *event.Event // 事件，当失败的时候需要创建事件
-	Executed bool         // 是否执行了，有些任务是过期了就不用执行了，这里会是false
-	Elapsed  float64      // 执行时间（请求时间合计）参考了py中的requests的模块命名
+	Success  bool    // 成功
+	Event    *Event  // 事件，当失败的时候需要创建事件
+	Executed bool    // 是否执行了，有些任务是过期了就不用执行了，这里会是false
+	Elapsed  float64 // 执行时间（请求时间合计）参考了py中的requests的模块命名
 }
 
 // 监控执行信息
@@ -126,4 +136,15 @@ func (info *ExecuteInfoMap) Set(k int, v ExecuteInfo) {
 	info.Lock.Lock()
 	(*info.Data)[k] = v
 	defer info.Lock.Unlock()
+}
+
+type FixResponse struct {
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
+}
+
+// 处理Web事件的操作
+type HandleWebEvent struct {
+	// 其要实现：Handler的接口
+	// 那么需要实现两个方法：Report, AutoFix
 }

@@ -27,6 +27,7 @@ type WebConfig struct {
 	LoginUrl                        string
 	MonitorListUrl                  string
 	EventCreateUrl                  string
+	EventAutoFixUrl                 string
 }
 
 func (c *WebConfig) GetLoginUrl() string {
@@ -84,6 +85,7 @@ func ParseWebParams() WebConfig {
 	webConfig.LoginUrl = webConfig.GetLoginUrl()
 	webConfig.MonitorListUrl = webConfig.GetMonitorListUrl()
 	webConfig.EventCreateUrl = fmt.Sprintf("%sapi/1.0/monitor/event/create", webConfig.Domain)
+	webConfig.EventAutoFixUrl = fmt.Sprintf("%sapi/1.0/monitor/autofix", webConfig.Domain)
 	return webConfig
 }
 

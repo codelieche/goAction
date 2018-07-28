@@ -1,4 +1,4 @@
-package event
+package monitor
 
 import (
 	"encoding/json"
@@ -12,10 +12,8 @@ import (
 */
 
 // 报告监控事件去web接口
-type ReportEventToWeb struct {
-}
 
-func (web *ReportEventToWeb) Report(e Event) (bool, string) {
+func (web *HandleWebEvent) Report(e *Event) (bool, string) {
 	// 向后端报告监控事件
 	var result bool
 

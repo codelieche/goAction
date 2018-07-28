@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"strings"
 
-	"codelieche.com/event"
 	"github.com/levigross/grequests"
 )
 
@@ -94,7 +93,7 @@ func (execute *WebTaskExecute) Execute(task *Task) (*Result, error) {
 		if err != nil {
 			log.Println("执行出现了错误:", err)
 			// 构造事件
-			event := event.Event{
+			event := Event{
 				Monitor: task.Monitor.Id,
 				Title:   fmt.Sprintf("第%d步：执行出现错误", i+1),
 				Content: err.Error(),
@@ -118,7 +117,7 @@ func (execute *WebTaskExecute) Execute(task *Task) (*Result, error) {
 					step.Url, resp.StatusCode, step.CodeMinExpr, step.CodeMin, step.CodeMaxExpr, step.CodeMax)
 			}
 			// 构造事件
-			event := event.Event{
+			event := Event{
 				Monitor: task.Monitor.Id,
 				Title:   fmt.Sprintf("状态码异常(第%d步)", i+1),
 				Content: message,
@@ -141,7 +140,7 @@ func (execute *WebTaskExecute) Execute(task *Task) (*Result, error) {
 				// 构造事件
 				message := fmt.Sprintf("请求:%s, 响应的标题中不包含：%s,返回的标题是: %s",
 					step.Url, step.Title, title)
-				event := event.Event{
+				event := Event{
 					Monitor: task.Monitor.Id,
 					Title:   fmt.Sprintf("检查响应标题(第%d步)出错", i+1),
 					Content: message,
@@ -160,7 +159,7 @@ func (execute *WebTaskExecute) Execute(task *Task) (*Result, error) {
 			// 响应的内容中没有，步骤中的内容
 			// 构造事件
 			message := fmt.Sprintf("请求:%s, 响应的内容中不包含：%s", step.Url, step.Body)
-			event := event.Event{
+			event := Event{
 				Monitor: task.Monitor.Id,
 				Title:   fmt.Sprintf("检查响应内容(第%d步)", i+1),
 				Content: message,

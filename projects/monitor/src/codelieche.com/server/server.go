@@ -27,6 +27,8 @@ func Run() {
 	// 执行任务的channel
 	taskChan := make(chan (monitor.Task), 10)
 	logChan := make(chan (monitor.Log), 10)
+	// 处理异常事件的handler
+	eventHandler := monitor.HandleWebEvent{}
 
 	process := monitor.Process{
 		Source:         &web,
@@ -34,6 +36,7 @@ func Run() {
 		ExecuteInfoMap: &executeInfoMap,
 		TaskChan:       taskChan,
 		LogChan:        logChan,
+		EventHandle:    &eventHandler,
 	}
 
 	// 执行process 程序
