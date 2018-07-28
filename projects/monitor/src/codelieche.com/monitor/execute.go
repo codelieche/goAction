@@ -37,13 +37,13 @@ func (execute *WebTaskExecute) Execute(task *Task) (*Result, error) {
 		return nil, fmt.Errorf("需要执行web相关的监控才行：当前的监控类型为:%s", task.Monitor.Category)
 	}
 	// 1-2: 如果任务过期了，也无需再执行
-	if task.ExecutedTime.Before(time.Now()) {
+	if task.ExpiredTime.Before(time.Now()) {
 		return nil, nil
 	}
 
 	// 第2步：判断执行时间
 	// 如果执行时间在当前时间之后，需要延时一下
-	if task.ExecutedTime.After(time.Now()) {
+	if task.ExpiredTime.After(time.Now()) {
 		time.Sleep(task.ExecutedTime.Sub(time.Now()))
 	}
 

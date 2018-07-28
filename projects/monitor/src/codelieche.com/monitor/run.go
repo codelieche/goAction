@@ -3,6 +3,8 @@ package monitor
 import (
 	"log"
 	"time"
+
+	"codelieche.com/settings"
 )
 
 /**
@@ -12,4 +14,18 @@ import (
 func (process *Process) Run() {
 	// 监控处理结构体执行入库 函数
 	log.Println("程序开始执行:", time.Now())
+
+	// 启动执行任务的goroutine
+	go process.ExecuteMonitorTask()
+	// 启动处理执行日志的goroutine
+	go process.RecordLog()
+
+	monitorCached := []Monitor{}
+	for {
+		start := time.Now()
+		nextTime := start.Add(time.Duration(settings.Config.Web.Interval) * time.Second)
+		// 执行生成task的程序
+		process.generateTaskMain(&monitorCached, nextTime)
+		time.Sleep(nextTime.Sub(time.Now()))
+	}
 }

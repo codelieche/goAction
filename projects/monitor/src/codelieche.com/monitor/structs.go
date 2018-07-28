@@ -23,6 +23,7 @@ type Monitor struct {
 	Category    string   `json:"category"` // 分类
 	Scene       string   // 场景：开发、测试、Bata、正式
 	Level       int      // 级别
+	Interval    int      `json:"interval"`
 	Retries     int      // 重试次数
 	Notify      []string // 通知人是字符串的列表，比如：["user01", "user02"]
 	Creator     string   // 添加者

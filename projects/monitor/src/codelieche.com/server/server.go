@@ -2,6 +2,7 @@ package server
 
 import (
 	"log"
+	"sync"
 
 	"codelieche.com/monitor"
 )
@@ -12,12 +13,17 @@ import (
 
 func Run() {
 	log.Println("程序开始运行")
+
 	// 获取列表的Source
 	web := monitor.ListMonitorFromWeb{}
 	// 执行监控任务的执行器
 	execute := monitor.WebTaskExecute{}
 	// 执行结果信息 映射
-	executeInfoMap := monitor.ExecuteInfoMap{}
+	executeInfoMapData := make(map[int]monitor.ExecuteInfo)
+	executeInfoMap := monitor.ExecuteInfoMap{
+		Data: &executeInfoMapData,
+		Lock: &sync.RWMutex{},
+	}
 	// 执行任务的channel
 	taskChan := make(chan (monitor.Task), 10)
 	logChan := make(chan (monitor.Log), 10)
