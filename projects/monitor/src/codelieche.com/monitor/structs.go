@@ -74,8 +74,8 @@ type Process struct {
 	Source         Lister          // 监控列表的源【web监控列表/ 服务器监控列表 / 其它监控列表】
 	TaskExecute    Executer        // 任务执行器【需要用到Execute的方法】请与source一一对应
 	ExecuteInfoMap *ExecuteInfoMap // 任务执行信息
-	taskChan       chan Task       // 监控执行任务的channel
-	logsChan       chan Log        // 监控执行日志的channel
+	TaskChan       chan Task       // 监控执行任务的channel
+	LogChan        chan Log        // 监控执行日志的channel
 
 }
 

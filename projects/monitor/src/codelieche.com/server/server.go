@@ -3,8 +3,6 @@ package server
 import (
 	"log"
 
-	"time"
-
 	"codelieche.com/monitor"
 )
 
@@ -14,30 +12,24 @@ import (
 
 func Run() {
 	log.Println("程序开始运行")
-	// 登录
-	//sesession, err := settings.Login()
-	//log.Println(sesession, err)
-	// 获取列表
+	// 获取列表的Source
 	web := monitor.ListMonitorFromWeb{}
+	// 执行监控任务的执行器
+	execute := monitor.WebTaskExecute{}
+	// 执行结果信息 映射
+	executeInfoMap := monitor.ExecuteInfoMap{}
+	// 执行任务的channel
+	taskChan := make(chan (monitor.Task), 10)
+	logChan := make(chan (monitor.Log), 10)
 
 	process := monitor.Process{
-		Source: &web,
+		Source:         &web,
+		TaskExecute:    &execute,
+		ExecuteInfoMap: &executeInfoMap,
+		TaskChan:       taskChan,
+		LogChan:        logChan,
 	}
-	monitors, err := process.Source.List()
-	if err != nil {
-		log.Println("获取监控数据列表出错：", err.Error())
-	}
-	execute := monitor.WebTaskExecute{}
 
-	for _, monitor_i := range monitors {
-		//log.Println(monitor_i)
-		task := monitor.Task{
-			Monitor:      &monitor_i,
-			Status:       "todo",
-			ExecutedTime: time.Now().Add(time.Duration(3) * time.Second),
-			ExpiredTime:  time.Now().Add(time.Duration(20) * time.Second),
-		}
-		execute.Execute(&task)
-		break
-	}
+	// 执行process 程序
+	process.Run()
 }

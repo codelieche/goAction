@@ -19,5 +19,5 @@ type Lister interface {
 
 // 执行监控的接口
 type Executer interface {
-	Execute(task *Task) (Result, error)
+	Execute(task *Task) (*Result, error)
 }
