@@ -1,8 +1,9 @@
-package monitor
+package event
 
 import (
 	"encoding/json"
 
+	"codelieche.com/monitor"
 	"codelieche.com/settings"
 	"github.com/levigross/grequests"
 )
@@ -13,7 +14,7 @@ import (
 
 // 报告监控事件去web接口
 
-func (web *HandleWebEvent) Report(e *Event) (bool, string) {
+func (web *HandleWebEvent) Report(e *monitor.Event) (bool, string) {
 	// 向后端报告监控事件
 	var result bool
 
@@ -48,7 +49,7 @@ func (web *HandleWebEvent) Report(e *Event) (bool, string) {
 	}
 
 	// 第3步：判断响应的结果是否有id字段
-	eventCreated := Event{}
+	eventCreated := monitor.Event{}
 	// 把字符串转换成 Event struct
 	if err := json.Unmarshal(resp.Bytes(), &eventCreated); err != nil {
 		return false, err.Error()

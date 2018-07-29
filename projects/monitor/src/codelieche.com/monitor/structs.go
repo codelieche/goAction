@@ -142,9 +142,3 @@ type FixResponse struct {
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
 }
-
-// 处理Web事件的操作
-type HandleWebEvent struct {
-	// 其要实现：Handler的接口
-	// 那么需要实现两个方法：Report, AutoFix
-}

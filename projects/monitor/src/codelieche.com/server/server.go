@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 
+	"codelieche.com/event"
 	"codelieche.com/monitor"
 )
 
@@ -28,7 +29,7 @@ func Run() {
 	taskChan := make(chan (monitor.Task), 10)
 	logChan := make(chan (monitor.Log), 10)
 	// 处理异常事件的handler
-	eventHandler := monitor.HandleWebEvent{}
+	eventHandler := event.HandleWebEvent{}
 
 	process := monitor.Process{
 		Source:         &web,

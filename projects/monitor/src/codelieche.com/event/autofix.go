@@ -1,8 +1,9 @@
-package monitor
+package event
 
 import (
 	"encoding/json"
 
+	"codelieche.com/monitor"
 	"codelieche.com/settings"
 	"github.com/levigross/grequests"
 )
@@ -17,9 +18,9 @@ import (
 2. 取出web系统当前监控相关的所有正在处理中的事件
 3. 设置其状态为autofixed
 */
-func (web *HandleWebEvent) AutoFix(m *Monitor) (FixResponse, error) {
+func (web *HandleWebEvent) AutoFix(m *monitor.Monitor) (monitor.FixResponse, error) {
 	// 第1步：先准备好接收响应的接口
-	result := FixResponse{}
+	result := monitor.FixResponse{}
 
 	// 第2步：登录系统获取session
 	session, err := settings.Login()
