@@ -1,8 +1,10 @@
-package monitor
+package execute
+
+import "codelieche.com/monitor"
 
 // 检查Http请求的Code
 // 根据监控Step的: CodeMin, CodeMinExpr, CodeMax, CodeMaxExpr
-func CheckResponseStatusCode(step *Step, code int) bool {
+func CheckResponseStatusCode(step *monitor.Step, code int) bool {
 	// 第1步：根据CodeMinExpr处理
 	var result bool
 	if step.CodeMinExpr == ">=" {

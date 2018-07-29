@@ -1,4 +1,4 @@
-package monitor
+package source
 
 import (
 	"log"
@@ -6,23 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"codelieche.com/monitor"
 	"codelieche.com/settings"
 )
 
 // 获取监控的列表
 
-/**
-从web后端：获取监控列表
-- 通过运维平台获取监控列表
-1. 先登录web系统
-2. 获取所有的监控列表数据：list是分页的，all是返回所有的监控列表
-*/
-type ListMonitorFromWeb struct {
-	//Session *grequests.Session // 登录了web系统的session，然后可以直接访问页面获取list
-	//Url     string
-}
-
-func (web *ListMonitorFromWeb) List() ([]Monitor, error) {
+func (web *ListMonitorFromWeb) List() ([]monitor.Monitor, error) {
 	// 获取监控列表
 	// 发起请求：得到所有的监控列表
 
@@ -41,7 +31,7 @@ func (web *ListMonitorFromWeb) List() ([]Monitor, error) {
 	} else {
 		// 第3步：处理返回的响应
 		// 后台使用的是：Django Rest Framework
-		var results []Monitor
+		var results []monitor.Monitor
 		if err := json.Unmarshal(resp.Bytes(), &results); err == nil {
 			// 第4步：返回监控列表【只有执行到这里才是正确的
 			if len(results) == 0 {
