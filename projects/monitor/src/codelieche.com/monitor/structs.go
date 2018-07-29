@@ -88,6 +88,7 @@ type Process struct {
 	TaskChan       chan Task       // 监控执行任务的channel
 	LogChan        chan Log        // 监控执行日志的channel
 	EventHandle    Handler         // 处理监控异常事件的操作
+	LogHandle      LogHandler      // 处理日志相关的操作
 }
 
 // 监控的任务

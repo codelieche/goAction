@@ -6,6 +6,7 @@ import (
 
 	"codelieche.com/event"
 	"codelieche.com/execute"
+	"codelieche.com/logs"
 	"codelieche.com/monitor"
 	"codelieche.com/source"
 )
@@ -36,8 +37,12 @@ func Run() {
 	// 执行任务的channel
 	taskChan := make(chan (monitor.Task), 10)
 	logChan := make(chan (monitor.Log), 10)
+
 	// 处理异常事件的handler
 	eventHandler := event.HandleWebEvent{}
+
+	// 处理日志的handler
+	logHandle := logs.RecordLogToInfluxdb{}
 
 	process := monitor.Process{
 		Source:         &web,
@@ -46,6 +51,7 @@ func Run() {
 		TaskChan:       taskChan,
 		LogChan:        logChan,
 		EventHandle:    &eventHandler,
+		LogHandle:      &logHandle,
 	}
 
 	// 执行process 程序

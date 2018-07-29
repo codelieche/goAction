@@ -43,3 +43,8 @@ type Handler interface {
 	Reporter
 	AutoFixer
 }
+
+// 日志操作的接口
+type LogHandler interface {
+	RecordLog(c chan Log)
+}

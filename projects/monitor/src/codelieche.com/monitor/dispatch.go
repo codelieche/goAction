@@ -25,10 +25,13 @@ func (process *Process) ExecuteMonitorTask() {
 2. 写入Log
 */
 func (process *Process) RecordLog() {
-	for {
-		executeLog := <-process.LogChan
-		log.Println("处理日志：", executeLog)
-	}
+	//for {
+	//	executeLog := <-process.LogChan
+	//	log.Println("处理日志：", executeLog)
+	//}
+
+	// 使用传入的：LogHandle.RecordLog()处理
+	process.LogHandle.RecordLog(process.LogChan)
 }
 
 /**
