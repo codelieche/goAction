@@ -89,6 +89,20 @@ type Process struct {
 	LogChan        chan Log        // 监控执行日志的channel
 	EventHandle    Handler         // 处理监控异常事件的操作
 	LogHandle      LogHandler      // 处理日志相关的操作
+	Info           *SystemInfo     // 处理程序的信息
+}
+
+// 处理程序监控信息
+type SystemInfo struct {
+	Count       int       `json:"count"`       // 成功和失败执行的任务数
+	Tps         int       `json:"tps"`         // 每秒处理的次数
+	TaskChanLen int       `json:"taskChanLen"` // 任务channel的长度
+	LogChanLen  int       `json:"logChanLen"`  // 日志channel的长度
+	EventCount  int       `json:"eventCount"`  // 触发事件的次数
+	StartTime   time.Time `json:"startTime"`   //程序开始时间
+	RunTime     string    `json:"runTime"`     // 运行总时间
+	SuccessNum  int       `json:"successNum"`  // 执行监控成功次数
+	ErrorNum    int       `json:"errorNum"`    // 执行监控任务错误次数
 }
 
 // 监控的任务

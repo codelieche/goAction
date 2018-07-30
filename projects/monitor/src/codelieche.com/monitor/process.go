@@ -53,6 +53,9 @@ func (process *Process) executeTask(task *Task) {
 
 	// 4-4: 判断是否执行成功
 	if result.Success {
+		// 执行成功：插入条数据到统计channel中
+		systemInfoStatChan <- taskExecuteSuccess
+
 		// 执行成功
 		if !executeInfo.IsOk {
 			executeInfo.IsOk = true
@@ -84,6 +87,9 @@ func (process *Process) executeTask(task *Task) {
 		}
 	} else {
 		// 执行失败
+		// 执行失败：插入条数据到统计channel中
+		systemInfoStatChan <- taskExecuteError
+
 		executeInfo.ErrorCount = executeInfo.ErrorCount + 1
 		if executeInfo.IsOk {
 			executeInfo.IsOk = false
@@ -98,6 +104,9 @@ func (process *Process) executeTask(task *Task) {
 			if executeInfo.ErrorCount == task.Monitor.Retries+1 {
 				// 第6步：创建新的异常事件
 				message := fmt.Sprintf("%s(%d): 需要创建异常事件了", task.Monitor.Name, task.Monitor.Id)
+				// 执行失败：创建一条异常事件
+				systemInfoStatChan <- taskEventCreate
+
 				log.Println(message)
 				// 创建异常事件
 				// 执行监控返回的结果中有个Event对象的
@@ -116,7 +125,6 @@ func (process *Process) executeTask(task *Task) {
 			return
 		}
 	}
-
 	// 由于 := 得到的executeInfo是指传递，所以需要重新修改下
 	// 最后重新设置执行信息
 	process.ExecuteInfoMap.Set(monitorId, executeInfo)

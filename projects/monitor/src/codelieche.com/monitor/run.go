@@ -20,6 +20,9 @@ func (process *Process) Run() {
 	// 启动处理执行日志的goroutine
 	go process.RecordLog()
 
+	// 启动系统统计信息
+	go process.statSystemInfo()
+
 	monitorCached := []Monitor{}
 	for {
 		start := time.Now()

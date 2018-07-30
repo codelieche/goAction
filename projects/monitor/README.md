@@ -44,6 +44,16 @@
 - `EventHandle`: 处理异常事件的操作
 - `LogHandle`: 处理日志相关的操作
 - 实例化Process的时候需要传递上面的值
+- `Info`: 系统执行信息：`SystemInfo`
+    1. `Count`: 处理监控任务次数统计
+    2. `Tps`: 每秒处理的次数
+    3. `TaskChanLen`: TaskChan的长度
+    4. `LogChanLen`: LogChan的长度
+    5. `EventCount`: 触发事件的次数
+    6. `StartTime`: process开始的时间
+    7. `RunTime`: 运行总时间
+    8. `ErrorCount`: 执行错误次数
+    9. `ErrorCount`: 执行错误次数
 
 ### package
 - `monitor`: 监控的核心包：主要定义了`struct`和`interface`

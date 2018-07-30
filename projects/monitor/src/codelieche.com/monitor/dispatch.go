@@ -120,5 +120,7 @@ func (process *Process) generateMonitorTask(m Monitor, nextFreshTime time.Time) 
 
 		// 第4步：把任务加入到channel中
 		process.TaskChan <- task
+		// 加入条数据到：统计信息的channel中
+		systemInfoStatChan <- taskCount
 	}
 }
