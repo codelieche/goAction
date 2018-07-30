@@ -95,7 +95,7 @@ type Process struct {
 // 处理程序监控信息
 type SystemInfo struct {
 	Count       int       `json:"count"`       // 成功和失败执行的任务数
-	Tps         int       `json:"tps"`         // 每秒处理的次数
+	Tps         float64   `json:"tps"`         // 每秒处理的次数
 	TaskChanLen int       `json:"taskChanLen"` // 任务channel的长度
 	LogChanLen  int       `json:"logChanLen"`  // 日志channel的长度
 	EventCount  int       `json:"eventCount"`  // 触发事件的次数

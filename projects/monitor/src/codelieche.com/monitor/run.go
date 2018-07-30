@@ -23,6 +23,9 @@ func (process *Process) Run() {
 	// 启动系统统计信息
 	go process.statSystemInfo()
 
+	// 启动计算tps的函数
+	//process.calculateTps()
+
 	monitorCached := []Monitor{}
 	for {
 		start := time.Now()

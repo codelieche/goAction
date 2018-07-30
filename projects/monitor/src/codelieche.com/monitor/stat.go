@@ -1,6 +1,9 @@
 package monitor
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
 // 系统信息统计的channel
 const (
@@ -11,6 +14,7 @@ const (
 )
 
 var systemInfoStatChan = make(chan int, 100)
+var tpsSlice []int
 
 func (process *Process) statSystemInfo() {
 	for n := range systemInfoStatChan {
@@ -32,4 +36,19 @@ func (process *Process) statSystemInfo() {
 		}
 
 	}
+}
+
+func (process *Process) calculateTps() {
+	ticker := time.NewTicker(time.Second * 60)
+	go func() {
+		for {
+			<-ticker.C
+			tpsSlice = append(tpsSlice, process.Info.SuccessNum)
+			// log.Println("ticker.C", tpsSlice)
+			if len(tpsSlice) > 2 {
+				tpsSlice = tpsSlice[1:]
+				process.Info.Tps = float64(tpsSlice[1]-tpsSlice[0]) / 60
+			}
+		}
+	}()
 }
