@@ -88,17 +88,19 @@ func (process *Process) generateMonitorTask(m Monitor, nextFreshTime time.Time) 
 		process.ExecuteInfoMap.Set(monitorId, executeInfo)
 	}
 
-	// 2-2: 对上次执行任务的时间进行修复处理
-	// 任务执行时间、任务执行过期时间
-	taskExecuteTime := now
-	taskExecuteExpireTime := now
-
 	// 如果执行信息中的：最后执行时间小于now了，就把LastTaskTime设置为now
 	// 这个是为了防止程序运行中，待机了，进入休眠停止很久了，再次继续执行，而LastTaskTime还是很久之前的
 	if executeInfo.LastExecuteTime.Before(now) {
 		// 这个监控最后一次执行监控任务的事件
 		executeInfo.LastExecuteTime = now
 	}
+
+	// 2-2: 对上次执行任务的时间进行修复处理
+	// 任务执行时间、任务执行过期时间
+	taskExecuteTime := executeInfo.LastExecuteTime
+
+	// 任务执行过期时间
+	taskExecuteExpireTime := taskExecuteTime.Add(time.Duration(m.Interval) * time.Second)
 
 	// 第3步：创建Task
 	// 注意：创建的条件是：任务执行时间在下次刷新时间的前面
@@ -113,6 +115,8 @@ func (process *Process) generateMonitorTask(m Monitor, nextFreshTime time.Time) 
 			ExecutedTime: taskExecuteTime,
 			ExpiredTime:  taskExecuteExpireTime,
 		}
+		// log.Println(taskExecuteTime, executeInfo.LastExecuteTime)
+
 		// 修改执行信息的最后一次任务时间
 		executeInfo.LastExecuteTime = taskExecuteTime
 		// 把执行信息更新到 map中
