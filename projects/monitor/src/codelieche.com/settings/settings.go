@@ -28,6 +28,7 @@ type WebConfig struct {
 	MonitorListUrl                  string
 	EventCreateUrl                  string
 	EventAutoFixUrl                 string
+	ServerPort                      int
 }
 
 func (c *WebConfig) GetLoginUrl() string {
@@ -73,6 +74,7 @@ func ParseParams() (WebConfig, DatabaseConfig) {
 	username := flag.String("username", "admin", "用户名")
 	password := flag.String("password", "admin", "用户密码")
 	interval := flag.Int("interval", 30, "刷新监控列表频率(秒)")
+	port := flag.Int("port", 9000, "启动的web服务器端口号")
 	var domain string
 	flag.StringVar(&domain, "domain", "http://127.0.0.1:8080/", "服务器地址")
 
@@ -80,17 +82,18 @@ func ParseParams() (WebConfig, DatabaseConfig) {
 	dbuser := flag.String("dbuser", "admin", "数据库用户")
 	dbpwd := flag.String("dbpwd", "admin", "数据库用户密码")
 	dbhost := flag.String("dbhost", "127.0.0.1", "数据库Host")
-	port := flag.Int("port", 8086, "数据库端口号")
+	dbport := flag.Int("dbport", 8086, "数据库端口号")
 	db := flag.String("db", "monitor", "数据库名")
 	logLength := flag.Int("loglength", 50, "一次写入多少条日志")
 
 	flag.Parse()
 	webConfig := WebConfig{
-		Env:      *env,
-		Domain:   domain,
-		UserName: *username,
-		PassWord: *password,
-		Interval: *interval,
+		Env:        *env,
+		Domain:     domain,
+		UserName:   *username,
+		PassWord:   *password,
+		Interval:   *interval,
+		ServerPort: *port,
 	}
 	webConfig.checkDomain()
 	webConfig.LoginUrl = webConfig.GetLoginUrl()
@@ -98,7 +101,7 @@ func ParseParams() (WebConfig, DatabaseConfig) {
 	webConfig.EventCreateUrl = fmt.Sprintf("%sapi/1.0/monitor/event/create", webConfig.Domain)
 	webConfig.EventAutoFixUrl = fmt.Sprintf("%sapi/1.0/monitor/autofix", webConfig.Domain)
 
-	dbConfig := DatabaseConfig{*dbhost, *port, *db, *dbuser, *dbpwd, *logLength}
+	dbConfig := DatabaseConfig{*dbhost, *dbport, *db, *dbuser, *dbpwd, *logLength}
 	return webConfig, dbConfig
 }
 

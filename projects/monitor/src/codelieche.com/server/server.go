@@ -1,7 +1,9 @@
 package server
 
 import (
+	"codelieche.com/settings"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -22,5 +24,6 @@ func (server *MonitorServer) start() {
 	})
 
 	// 启动web服务
-	http.ListenAndServe(":9000", nil)
+	addr := fmt.Sprintf(":%d", settings.Config.Web.ServerPort)
+	http.ListenAndServe(addr, nil)
 }
