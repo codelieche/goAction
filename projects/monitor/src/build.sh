@@ -24,7 +24,7 @@ mv ./webMonitor ../Docker
 cd ../Docker
 
 # 2-3：构建镜像
-docker build -t ops-monitor:v1-alpine ./
+docker build -t ops-monitor:v1 ./
 
 # 2-4：删除golang打包的文件
 rm ./webMonitor
