@@ -92,7 +92,7 @@ func handlePostDetail(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	server := http.Server{
-		Addr: ":9090",
+		Addr: ":9000",
 	}
 	http.HandleFunc("/post/create", handlePostCreate)
 	http.HandleFunc("/post", handlePostDetail)
