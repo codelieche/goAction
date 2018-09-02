@@ -21,3 +21,18 @@ func TestUploadFileToS3(t *testing.T) {
 		t.Log("上传文件成功:", url)
 	}
 }
+
+// 删除s3对象测试
+func TestDeleteS3Object(t *testing.T) {
+	var bucketName = "test"
+	var keyName = "test/1234.txt"
+	if result, err := DeleteS3Object(bucketName, keyName); err != nil {
+		t.Error("删除对象失败：", err.Error())
+	} else {
+		if result {
+			t.Log("删除对象成功")
+		} else {
+			t.Error("删除对象失败！但是没报错")
+		}
+	}
+}
