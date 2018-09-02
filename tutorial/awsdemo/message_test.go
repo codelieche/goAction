@@ -53,3 +53,16 @@ func TestReceiveMessage(t *testing.T) {
 		}
 	}
 }
+
+// 测试删除消息
+func TestDeleteSqsMessage(t *testing.T) {
+	queueUrl := "https://sqs.ap-southeast-1.amazonaws.com/xxxxx"
+	receiptHandle := "xxxx"
+	// receiptHandle 和 queueUrl可以从ReciveMessage中获取到
+
+	if err := DeleteSqsMessage(queueUrl, receiptHandle); err != nil {
+		t.Error("删除消息失败：", err.Error())
+	} else {
+		t.Log("删除消息成功！")
+	}
+}

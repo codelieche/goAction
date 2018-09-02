@@ -108,3 +108,23 @@ func ReceiveMessage(queueUrl string, maxNumber int64) (result *sqs.ReceiveMessag
 		return result, nil
 	}
 }
+
+// 从sqs中删除消息
+func DeleteSqsMessage(queueUrl string, receiptHandle string) error {
+	// 1. 先实例化
+	sess := NewAwsSession()
+	svc := sqs.New(sess)
+
+	// 2. 操作删除
+	input := sqs.DeleteMessageInput{
+		QueueUrl:      aws.String(queueUrl),
+		ReceiptHandle: aws.String(receiptHandle),
+	}
+
+	if _, err := svc.DeleteMessage(&input); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
