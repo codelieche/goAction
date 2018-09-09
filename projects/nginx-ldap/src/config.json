@@ -1,0 +1,8 @@
+{
+  "LdapServer": "127.0.0.1",
+  "LdapPort": 389,
+  "BaseDN": "DC=exampe,DC=com",
+  "BindDN": "readonly",
+  "BindPW": "password",
+  "UserSSL": false
+}
