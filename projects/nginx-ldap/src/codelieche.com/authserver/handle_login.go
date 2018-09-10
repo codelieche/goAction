@@ -1,9 +1,12 @@
 package authserver
 
 import (
+	"html/template"
 	"net/http"
 
 	"fmt"
+
+	"log"
 
 	"codelieche.com/ldaplib"
 )
@@ -27,8 +30,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 		if username == "" || password == "" {
 			lr := LoginResponse{false, "用户名/密码为空"}
-			w.Write(lr.Marshal())
 			w.WriteHeader(400)
+			w.Write(lr.Marshal())
 			return
 		}
 
@@ -40,7 +43,16 @@ func login(w http.ResponseWriter, r *http.Request) {
 			session.Save(r, w)
 			// 校验成功
 			lr := LoginResponse{true, "登录成功:" + username}
-			w.Write(lr.Marshal())
+			//w.Write(lr.Marshal())
+			if t, err := template.ParseFiles("templates/login.html"); err != nil {
+				log.Println(err)
+				msg := fmt.Sprintf("加载模板出错: %s", err.Error())
+				http.Error(w, msg, 500)
+				return
+			} else {
+				t.Execute(w, lr)
+				return
+			}
 			return
 		} else {
 			// 登录失败
@@ -48,9 +60,19 @@ func login(w http.ResponseWriter, r *http.Request) {
 			// 设置session
 			session.Values["authenticated"] = false
 			session.Save(r, w)
-			lr := LoginResponse{true, "登录失败:用户名/密码错误"}
-			w.Write(lr.Marshal())
+			lr := LoginResponse{false, "登录失败:用户名/密码错误"}
 			w.WriteHeader(400)
+			// 模板渲染登录结果
+			if t, err := template.ParseFiles("templates/login.html"); err != nil {
+				log.Println(err)
+				msg := fmt.Sprintf("加载模板出错: %s", err.Error())
+				http.Error(w, msg, 500)
+				return
+			} else {
+				t.Execute(w, lr)
+				return
+			}
+			//w.Write(lr.Marshal())
 			return
 		}
 	} else {
@@ -59,12 +81,29 @@ func login(w http.ResponseWriter, r *http.Request) {
 			// 用户登录成功
 			msg := fmt.Sprintf("登录用户:%s", session.Values["username"])
 			lr := LoginResponse{true, msg}
-			w.Write(lr.Marshal())
+			//w.Write(lr.Marshal())
+			// 模板渲染登录结果
+			if t, err := template.ParseFiles("templates/login.html"); err != nil {
+				log.Println(err)
+				msg := fmt.Sprintf("加载模板出错: %s", err.Error())
+				http.Error(w, msg, 500)
+				return
+			} else {
+				t.Execute(w, lr)
+				return
+			}
 			return
 		} else {
 			// 用户登录失败的：渲染登录页面
-			w.Write([]byte("登录页面"))
-			return
+			if t, err := template.ParseFiles("templates/login.html"); err != nil {
+				log.Println(err)
+				msg := fmt.Sprintf("加载模板出错: %s", err.Error())
+				http.Error(w, msg, 500)
+				return
+			} else {
+				t.Execute(w, nil)
+				return
+			}
 		}
 	}
 

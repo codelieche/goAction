@@ -25,10 +25,14 @@ func checkSessionMiddleWare(next http.Handler) http.Handler {
 			// 如果是GET访问，而且session是新的，就直接返回未登录吧
 			if r.Method == "GET" && r.URL.Path == "/account/auth" {
 				if session.IsNew {
+					w.Header().Add("Content-Type", "application/json")
+					w.WriteHeader(401)
+					w.Write([]byte(`{"detail": "Authentication credentials were not provided."}`))
 					//http.Error(w, `{"detail": "Authentication credentials were not provided."}`, 401)
-					//return
-					http.Redirect(w, r, "/account/login", 301)
 					return
+					// 跳转到登录页面
+					//http.Redirect(w, r, "/account/login", 302)
+					//return
 				}
 			}
 		}
