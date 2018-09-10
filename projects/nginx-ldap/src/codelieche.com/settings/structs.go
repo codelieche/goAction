@@ -18,6 +18,8 @@ type LdapConfig struct {
 	BindPW    string
 	FilterStr string // (sAMAccountName=%s) 一般是这样的
 	UserSSL   bool   // 是否使用加密传输
+
+	WebSecretKey string // web生成session的密匙
 }
 
 // 从文件读取配置内容

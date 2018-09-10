@@ -8,15 +8,17 @@
 ### 依赖
 - ldap.v2
 
-安装：
+安装：`go get gopkg.in/ldap.v2`
 
-```bash
-go get gopkg.in/ldap.v2
-```
+- gorilla/sessions
+
+安装：`go get github.com/gorilla/sessions`
+
 
 ### 参考文档
 - [ngx_http_auth_request_module](http://nginx.org/en/docs/http/ngx_http_auth_request_module.html)
 - [ldap.V2](https://godoc.org/gopkg.in/ldap.v2)
 - [nginx-ldap-auth](https://github.com/nginxinc/nginx-ldap-auth)
+- [gorialla/sessions](https://github.com/gorilla/sessions)
 
 

@@ -6,5 +6,13 @@ import "net/http"
 func webRooter(w http.ResponseWriter, r *http.Request) {
 
 	// 1. 处理
-	HandleAuth(w, r)
+	switch {
+	case r.URL.Path == "/account/auth" || r.URL.Path == "/account/auth/":
+		auth(w, r)
+	case r.URL.Path == "/account/login" || r.URL.Path == "/account/login/":
+		login(w, r)
+	default:
+		http.Error(w, "Page Not Found", 404)
+		return
+	}
 }

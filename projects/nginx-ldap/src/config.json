@@ -4,5 +4,7 @@
   "BaseDN": "DC=exampe,DC=com",
   "BindDN": "readonly",
   "BindPW": "password",
-  "UserSSL": false
+  "UserSSL": false,
+
+  "WebSecretKey": "a9a1a83c6505ccc6f27989f1990de18e"
 }
