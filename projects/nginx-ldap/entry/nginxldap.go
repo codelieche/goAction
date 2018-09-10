@@ -1,7 +1,12 @@
 package main
 
-import "codelieche.com/ldaplib"
+import (
+	"log"
+
+	"codelieche.com/ldaplib"
+)
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	ldaplib.Auth("xxx", "xxx")
 }

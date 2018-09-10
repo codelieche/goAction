@@ -31,9 +31,16 @@ func Auth(username string, password string) bool {
 
 	// First bind with a read only user
 	// 首先我们bind账号：禁止匿名查询，就需要先bind个
-	if err = l.Bind(settings.Config.BindDN, settings.Config.BindPW); err != nil {
+	// 配置中如果没有那就直接用当前登录用户、密码不正确直接返回false
+	bindDN := settings.Config.BindDN
+	bindPW := settings.Config.BindPW
+	if bindDN == "" || bindPW == "" {
+		bindDN = username
+		bindPW = password
+	}
+	if err = l.Bind(bindDN, bindPW); err != nil {
 		// Bind Error
-		log.Println("Bind Failed:", err.Error())
+		//log.Println("Bind Failed:", err.Error())
 		return false
 	}
 
@@ -47,30 +54,36 @@ func Auth(username string, password string) bool {
 		// 我们需要认证的用户名filter字符
 		filterString,
 		// Attributes: 这里是查询返回的属性，以数组的形式提供，如果为空就会返回所有的属性：eg: []string{"dn"} / nil
-		[]string{"dn"},
+		[]string{"cn", "description", "displayName", "department", "name", "sAMAccountName", "userPrincipalName", "mobile"},
+		//nil,
 		nil,
 	)
 
 	// 开始搜索
 	if searchResult, err := l.Search(searchRequest); err != nil {
 		// 搜索出错
-		log.Printf("搜索失败：%s\n", err.Error())
+		//log.Printf("搜索失败：%s\n", err.Error())
 		return false
 	} else {
 		if len(searchResult.Entries) != 1 {
 			// 搜索的用户不存在或者是多个值
-			log.Println("搜索的结果长度不等于1")
+			//log.Println("搜索的结果长度不等于1")
 			return false
 		}
 
 		// 得到要获取用户的DN
 		userDN := searchResult.Entries[0].DN
+		// 打印出属性：测试的时候取消注释
+		//userAttributes := searchResult.Entries[0].Attributes
+		//for _, a := range userAttributes {
+		//	log.Println(a.Name, ": ", a.Values[0])
+		//}
 		//log.Println(userDN)
 
 		// Bind as the user to verify their password
 		// 拿这个 dn 和它的密码去做 bind 验证
 		if err := l.Bind(userDN, password); err != nil {
-			log.Println("密码不正确:", err.Error())
+			//log.Println("密码不正确:", err.Error())
 			return false
 		} else {
 			// 只有到这里才是正确的
