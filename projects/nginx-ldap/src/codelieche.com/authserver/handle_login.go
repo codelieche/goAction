@@ -8,6 +8,8 @@ import (
 
 	"log"
 
+	"strings"
+
 	"codelieche.com/ldaplib"
 )
 
@@ -23,13 +25,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 1. POST登录：
-
 	if r.Method == "POST" {
 		username := r.PostFormValue("username")
 		password := r.PostFormValue("password")
+		nextUrl := r.PostFormValue("next")
 
 		if username == "" || password == "" {
-			lr := LoginResponse{false, "用户名/密码为空"}
+			lr := LoginResponse{false, "用户名/密码为空", nextUrl}
 			w.WriteHeader(400)
 			w.Write(lr.Marshal())
 			return
@@ -42,25 +44,31 @@ func login(w http.ResponseWriter, r *http.Request) {
 			session.Values["username"] = username
 			session.Save(r, w)
 			// 校验成功
-			lr := LoginResponse{true, "登录成功:" + username}
-			//w.Write(lr.Marshal())
-			if t, err := template.ParseFiles("templates/login.html"); err != nil {
-				log.Println(err)
-				msg := fmt.Sprintf("加载模板出错: %s", err.Error())
-				http.Error(w, msg, 500)
+			if nextUrl != "" {
+				// 跳转链接
+				http.Redirect(w, r, nextUrl, 302)
 				return
 			} else {
-				t.Execute(w, lr)
-				return
+				// 登录成功
+				lr := LoginResponse{true, "登录成功:" + username, nextUrl}
+				//w.Write(lr.Marshal())
+				if t, err := template.ParseFiles("templates/login.html"); err != nil {
+					log.Println(err)
+					msg := fmt.Sprintf("加载模板出错: %s", err.Error())
+					http.Error(w, msg, 500)
+					return
+				} else {
+					t.Execute(w, lr)
+					return
+				}
 			}
-			return
 		} else {
 			// 登录失败
 
 			// 设置session
 			session.Values["authenticated"] = false
 			session.Save(r, w)
-			lr := LoginResponse{false, "登录失败:用户名/密码错误"}
+			lr := LoginResponse{false, "登录失败:用户名/密码错误", nextUrl}
 			w.WriteHeader(400)
 			// 模板渲染登录结果
 			if t, err := template.ParseFiles("templates/login.html"); err != nil {
@@ -76,32 +84,46 @@ func login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
+		r.ParseForm()
+		nextUrl := r.Form.Get("next")
+		if nextUrl == "" {
+			nextUrl = r.Header.Get("X-Next")
+		}
 		// 获取cookie
 		if session.Values["authenticated"] != nil && session.Values["authenticated"].(bool) {
-			// 用户登录成功
-			msg := fmt.Sprintf("登录用户:%s", session.Values["username"])
-			lr := LoginResponse{true, msg}
-			//w.Write(lr.Marshal())
-			// 模板渲染登录结果
-			if t, err := template.ParseFiles("templates/login.html"); err != nil {
-				log.Println(err)
-				msg := fmt.Sprintf("加载模板出错: %s", err.Error())
-				http.Error(w, msg, 500)
+			if nextUrl != "" && !strings.HasPrefix(nextUrl, "/account/login") {
+				// 跳转链接
+				http.Redirect(w, r, nextUrl, 302)
 				return
 			} else {
-				t.Execute(w, lr)
-				return
+				// 用户登录成功
+				username := session.Values["username"].(string)
+				lr := LoginResponse{true, "登录用户:" + username, nextUrl}
+				//w.Write(lr.Marshal())
+				if t, err := template.ParseFiles("templates/login.html"); err != nil {
+					log.Println(err)
+					msg := fmt.Sprintf("加载模板出错: %s", err.Error())
+					http.Error(w, msg, 500)
+					return
+				} else {
+					t.Execute(w, lr)
+					return
+				}
 			}
-			return
+
 		} else {
-			// 用户登录失败的：渲染登录页面
+			// 用户未登录：渲染登录页面
 			if t, err := template.ParseFiles("templates/login.html"); err != nil {
 				log.Println(err)
 				msg := fmt.Sprintf("加载模板出错: %s", err.Error())
 				http.Error(w, msg, 500)
 				return
 			} else {
-				t.Execute(w, nil)
+				var lr LoginResponse
+				if nextUrl != "" && !strings.HasPrefix(nextUrl, "/account/login") {
+					lr = LoginResponse{false, "", nextUrl}
+				}
+				t.Execute(w, lr)
 				return
 			}
 		}

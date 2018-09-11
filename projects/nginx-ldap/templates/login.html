@@ -51,7 +51,9 @@
                 <p>
                     <label for="id_password">密码：</label>
                     <input type="password" name="password", required id="id_password">
+
                 </p>
+                <input type="hidden" name="next", required id="id_next" value="{{ .Next }}">
                 <div class="message">
                     {{ .Message }}
                 </div>
