@@ -15,6 +15,8 @@ func webRooter(w http.ResponseWriter, r *http.Request) {
 		login(w, r)
 	case r.URL.Path == "/account/logout" || r.URL.Path == "/account/logout/":
 		logout(w, r)
+	case r.URL.Path == "/account/users" || r.URL.Path == "/account/users/":
+		handlerUsers(w, r)
 	default:
 		http.Error(w, "Page Not Found", 404)
 		return

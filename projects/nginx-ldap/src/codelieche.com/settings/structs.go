@@ -20,6 +20,7 @@ type LdapConfig struct {
 	UserSSL   bool   // 是否使用加密传输
 
 	WebSecretKey string // web生成session的密匙
+	Admin        string // 管理员用户
 }
 
 // 从文件读取配置内容

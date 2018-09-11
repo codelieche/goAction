@@ -36,6 +36,32 @@ func login(w http.ResponseWriter, r *http.Request) {
 			w.Write(lr.Marshal())
 			return
 		}
+		// 判断是否是可以登录本系统的用户
+		usersList := strings.Split(usersListStr, ",")
+		// 先使用O(N)算法来执行
+		var canLogginSystem bool
+		for _, i := range usersList {
+			if i == username {
+				canLogginSystem = true
+				break
+			}
+		}
+		if !canLogginSystem {
+			// 用户不能登录本系统
+			msg := fmt.Sprintf("%s: 不能访问本系统，请先申请相关权限", username)
+			lr := LoginResponse{false, msg, nextUrl}
+			//w.Write(lr.Marshal())
+			if t, err := template.ParseFiles("templates/login.html"); err != nil {
+				log.Println(err)
+				msg := fmt.Sprintf("加载模板出错: %s", err.Error())
+				http.Error(w, msg, 500)
+				return
+			} else {
+				t.Execute(w, lr)
+				return
+			}
+
+		}
 
 		// ldap verify
 		if result := ldaplib.Auth(username, password); result {

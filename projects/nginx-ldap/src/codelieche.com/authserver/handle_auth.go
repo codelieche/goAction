@@ -26,7 +26,7 @@ func auth(w http.ResponseWriter, r *http.Request) {
 
 		if session.Values["authenticated"] != nil && session.Values["authenticated"].(bool) {
 			// 用户登录成功
-			w.Write([]byte("登录成功"))
+			w.Write([]byte("校验成功"))
 			return
 		} else {
 			// 用户登录失败的
