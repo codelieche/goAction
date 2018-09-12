@@ -19,4 +19,10 @@ then
     cp -rf /var/backup/conf/* /data/etc/nginx/
 fi;
 
+# 检查web服务是否启动
+if [ `netstat -lnput | grep 9000 | wc -l` -eq 0 ];
+then
+    cd /data/app && nohup ./app --config=./config.json & ls
+fi;
+
 exec "$@"

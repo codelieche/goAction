@@ -110,14 +110,26 @@ func login(w http.ResponseWriter, r *http.Request) {
 		}
 		// 获取cookie
 		if session.Values["authenticated"] != nil && session.Values["authenticated"].(bool) {
-			if nextUrl != "" && !strings.HasPrefix(nextUrl, "/account/login") {
+			// 判断用户已是否可以登录本系统
+			username := session.Values["username"].(string)
+			var canLoginSystem = userCanLoginSystem(username)
+
+			if nextUrl != "" && !strings.HasPrefix(nextUrl, "/account/login") && canLoginSystem {
 				// 跳转链接
 				http.Redirect(w, r, nextUrl, 302)
 				return
 			} else {
 				// 用户登录成功
-				username := session.Values["username"].(string)
-				lr := LoginResponse{true, "登录用户:" + username, nextUrl}
+				var msg string
+
+				if canLoginSystem {
+					msg = "登录用户:" + username
+				} else {
+					msg = fmt.Sprintf("%s: 无权限访问本系统，请先申请权限", username)
+					w.WriteHeader(403)
+				}
+
+				lr := LoginResponse{true, msg, nextUrl}
 				//w.Write(lr.Marshal())
 				if t, err := template.ParseFiles("templates/login.html"); err != nil {
 					log.Println(err)
