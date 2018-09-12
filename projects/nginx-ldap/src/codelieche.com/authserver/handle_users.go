@@ -35,3 +35,16 @@ func handlerUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func userCanLoginSystem(username string) bool {
+	// 判断是否是可以登录本系统的用户
+	usersList := strings.Split(usersListStr, ",")
+	// 先使用O(N)算法来执行
+	for _, i := range usersList {
+		if i == username {
+			return true
+		}
+	}
+	// 跳出循环了，表示未搜寻到用户
+	return false
+}

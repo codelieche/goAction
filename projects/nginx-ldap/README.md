@@ -61,3 +61,13 @@ server {
 - [gorialla/sessions](https://github.com/gorilla/sessions)
 
 
+### 使用
+
+```bash
+docker run -itd --name nginxldap -p 9090:80 nginxldap:v1
+docker exec -it nginxldap /bin/sh
+
+docker stop nginxldap
+docker rm nginxldap
+docker rmi nginxldap:v1
+```

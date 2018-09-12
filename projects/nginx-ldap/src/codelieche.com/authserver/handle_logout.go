@@ -12,7 +12,9 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		session.Values["authenticated"] = false
+		session.Values["username"] = ""
 		session.Save(r, w)
+
 		http.Redirect(w, r, "/account/login", 302)
 	}
 

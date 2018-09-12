@@ -13,6 +13,14 @@ import (
 // 检查session的中间件
 func checkSessionMiddleWare(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if c, err := r.Cookie("usersession"); err != nil {
+			// sessionid 不存在: 给请求添加一个
+
+		} else {
+			//log.Println(s.Name, s.Value)
+			c.MaxAge = -100
+		}
+
 		// 1. 判断是POST还是其它方法
 		if session, err := store.Get(r, "usersession"); err != nil {
 			// 获取sessionid出错

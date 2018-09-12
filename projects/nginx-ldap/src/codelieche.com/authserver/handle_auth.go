@@ -1,6 +1,7 @@
 package authserver
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -26,7 +27,18 @@ func auth(w http.ResponseWriter, r *http.Request) {
 
 		if session.Values["authenticated"] != nil && session.Values["authenticated"].(bool) {
 			// 用户登录成功
-			w.Write([]byte("校验成功"))
+			// 判断是否是可以登录本系统的用户
+			username := session.Values["username"].(string)
+			var canLogginSystem = userCanLoginSystem(username)
+
+			if canLogginSystem {
+				w.Write([]byte("校验成功"))
+			} else {
+				// 用户已没有权限访问本系统
+				w.WriteHeader(403)
+				msg := fmt.Sprintf("%s无权限访问本系统", username)
+				w.Write([]byte(msg))
+			}
 			return
 		} else {
 			// 用户登录失败的

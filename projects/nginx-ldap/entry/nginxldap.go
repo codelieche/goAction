@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"codelieche.com/ldaplib"
+	"codelieche.com/authserver"
 )
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	ldaplib.Auth("xxx", "xxx")
+	authserver.Run()
 }

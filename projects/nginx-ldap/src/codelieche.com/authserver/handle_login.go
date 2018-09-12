@@ -37,15 +37,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// 判断是否是可以登录本系统的用户
-		usersList := strings.Split(usersListStr, ",")
-		// 先使用O(N)算法来执行
-		var canLogginSystem bool
-		for _, i := range usersList {
-			if i == username {
-				canLogginSystem = true
-				break
-			}
-		}
+		var canLogginSystem = userCanLoginSystem(username)
+
 		if !canLogginSystem {
 			// 用户不能登录本系统
 			msg := fmt.Sprintf("%s: 不能访问本系统，请先申请相关权限", username)
