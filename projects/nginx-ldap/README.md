@@ -71,3 +71,11 @@ docker stop nginxldap
 docker rm nginxldap
 docker rmi nginxldap:v1
 ```
+
+### 推送到私有仓库
+
+```bash
+docker build . -t nginxldap:v1
+docker tag nginxldap:v1 registry.codelieche.com:5000/nginxldap:v1
+docker push registry.codelieche.com:5000/nginxldap:v1
+```
