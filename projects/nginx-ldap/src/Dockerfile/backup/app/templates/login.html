@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <style>
+        body{background-color: #eeeeee;color: #555;font-size: 14px;
+            font-family: "PingFang SC","Helvetica Neue",Helvetica,Arial,"Hiragino Sans GB","Microsoft Yahei","微软雅黑","华文细黑",sans-serif;}
+        .container {width: 100%; height: 100%; margin:0 auto; max-width: 1320px;position: relative;}
+        .container .logo {width: 100%; background-color: #4A90E2;text-align: center}
+        .container .logo img {width: 70%; height:auto; padding: 15px 0;}
+        .container .logo .title {width: 70%; height:auto; padding: 15px 0;display: inline-block;color: #ffffff;font-size: 16px}
+        .container .login{
+            text-align: center;margin: 100px auto;padding: 0;width: 350px;background-color: #fff;color: #666;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.38);border-radius: 5px;
+        }
+        .container .login .message {padding-bottom: 15px;font-size: 13px;}
+        .container .login form {padding: 15px 10px;}
+        .container .login p {margin-bottom: 20px;}
+        .container .login form p label{margin-right: 10px; width: 65px; text-align: left; font-size: 16px;display: inline-block;}
+        .container .login form p input{font-size: 14px;width: 180px;padding: 3px 5px; line-height: 22px;}
+        .container .login form .message {color: #FF9632;}
+        .container .login form .button .btn {
+            width: 90%;display: inline-block;font-size: 16px; line-height: 30px;
+            background-color: #fff; border: 1px solid #dfdfdf; color: #555;
+        }
+        .container .login form .reset-pwd{margin-top: 15px;}
+        .container .login form .reset-pwd a {text-decoration: none; color: #999; font-size: 12px;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="login">
+        <div class="logo">
+            {{/*<img src="" alt="Code Lieche">*/}}
+            <span class="title">LDAP登录</span>
+        </div>
+        {{if .Status  }}
+            <p>
+                <a href="/account/logout">退出登录</a>
+            </p>
+            <div class="message">
+                {{ .Message }}
+            </div>
+        {{ else }}
+            <form action="/account/login" method="post">
+                <p>
+                    <label for="id_username">用户名：</label>
+                    <input type="text" name="username" required id="id_username">
+                </p>
+                <p>
+                    <label for="id_password">密码：</label>
+                    <input type="password" name="password", required id="id_password">
+
+                </p>
+                <input type="hidden" name="next", required id="id_next" value="{{ .Next }}">
+                <div class="message">
+                    {{ .Message }}
+                </div>
+                <div class="button">
+                    <input type="submit" class="btn" value="登录">
+                </div>
+                <div class="reset-pwd">
+                    <a href>Reset Password</a>
+                </div>
+            </form>
+        {{ end }}
+
+    </div>
+</div>
+</body>
+</html>
