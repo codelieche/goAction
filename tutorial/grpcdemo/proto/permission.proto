@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto;
+
+service PermissionCheck {
+    rpc CheckPermission(CheckRequest) returns (CheckResponse){}
+}
+
+message CheckRequest {
+    string username = 1;
+    string permission = 2;
+}
+
+message CheckResponse {
+    bool status = 1;
+    string message = 2;
+}
