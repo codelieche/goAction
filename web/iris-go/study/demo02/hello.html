@@ -9,6 +9,12 @@
     <br>
     <div class="container">
         {{.Content}}
+        <hr />
+        {{if eq "Test" .Test}}
+            有Test且值为Test
+        {{ else }}
+                没有Test
+        {{end}}
     </div>
 </body>
 </html>
