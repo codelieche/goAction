@@ -9,3 +9,5 @@ go get -u github.com/golang/protobuf/protoc-gen-go
 protoc --version
 ```
 
+- `protoc --go_out=plugins=grpc:. helloworld.proto`
+
