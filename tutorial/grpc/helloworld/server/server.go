@@ -2,12 +2,17 @@ package main
 
 import (
 	"context"
-	pb "goAction/tutorial/grpc/helloworld/protos"
 	"net"
+
+	pb "goAction/tutorial/grpc/helloworld/protos"
 
 	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"
 )
+
+/**
+要引入pd，记得先执行：protoc --go_out=plugins=grpc:. helloworld.proto
+*/
 
 type server struct {
 }

@@ -1,5 +1,6 @@
 package main
 
+//noinspection GoInvalidPackageImport
 import (
 	"context"
 	"fmt"
@@ -10,6 +11,10 @@ import (
 	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"
 )
+
+/**
+要引入pd，记得先执行：protoc --go_out=plugins=grpc:. helloworld.proto
+*/
 
 const (
 	address = "localhost:9090"

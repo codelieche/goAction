@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"codelieche.com/authserver"
+	"goAction/projects/nginx-ldap/web/authserver"
 )
 
 func main() {

@@ -6,9 +6,5 @@ pkg/
 ./bin/*
 .pkg/*
 
-src/github.com/
-src/golang.org/
-src/gopkg.in/
-
-src/config-product.json
+config-prod.json
 entry/study.go

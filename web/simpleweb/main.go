@@ -122,7 +122,6 @@ func parseConfig() (string, int, int, int) {
 
 func init() {
 	host, port, duration, version = parseConfig()
-
 }
 
 func webRoute(w http.ResponseWriter, r *http.Request) {
