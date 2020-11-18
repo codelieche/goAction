@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -120,6 +121,75 @@ func parseConfig() (string, int, int, int) {
 	return *host, *port, *duration, *version
 }
 
+// request: 请求页面
+func handleRequestApi(w http.ResponseWriter, r *http.Request) {
+	// 判断是否有next
+	query := r.URL.Query()
+	next := query.Get("next")
+
+	nextRequestBody := ""
+	statusCode := 200
+	// 判断next的前缀
+	if strings.HasPrefix(next, "/") {
+		next = fmt.Sprintf("http://%s:%d%s", host, port, next)
+	}
+
+	// 需要是http开头
+	if !strings.HasPrefix(next, "http") {
+		if next != "" {
+			nextRequestBody = fmt.Sprintf("Next: %s", next)
+		}
+	}
+
+	// 发起http/https请求
+	if next != "" && strings.HasPrefix(next, "http") {
+		// log.Printf("有next的值：%s\n", next)
+		// 发起请求
+		if req, err := http.NewRequest("GET", next, nil); err != nil {
+			nextRequestBody = err.Error()
+			statusCode = 500
+		} else {
+			// 发起请求
+			client := &http.Client{}
+			if response, err := client.Do(req); err != nil {
+				nextRequestBody = err.Error()
+				statusCode = 500
+			} else {
+				defer response.Body.Close()
+
+				// 响应码: 以大的为准，比如开始是200，现在是404，那么设置为404
+				// 如果开始是404，后面出现了500，那么设置为500
+				if response.StatusCode > statusCode {
+					statusCode = response.StatusCode
+				}
+
+				// 读取body的内容
+				if body, err := ioutil.ReadAll(response.Body); err != nil {
+					nextRequestBody = err.Error()
+					statusCode = 500
+				} else {
+					// 设置nextRequestBody
+					nextRequestBody = fmt.Sprintf("\nNext: %s\nStatusCode：%d\nBody: %s\n", next, response.StatusCode, body)
+				}
+			}
+		}
+
+	}
+
+	// 兼容：/api /request的请求，设置个区别
+	prefix := "Api"
+	if strings.HasPrefix(r.URL.Path, "/request") {
+		prefix = "Request"
+	}
+	// 响应的主体内容
+	content := fmt.Sprintf("%s Page:%s | Version:%d\n%s", prefix, r.URL, version, nextRequestBody)
+
+	// 写入响应状态码和响应内容
+	w.WriteHeader(statusCode)
+	w.Write([]byte(content))
+	return
+}
+
 func init() {
 	host, port, duration, version = parseConfig()
 }
@@ -137,9 +207,13 @@ func webRoute(w http.ResponseWriter, r *http.Request) {
 		handleHealth(w, r)
 	//	以/api开头的地址都用handleApi来处理
 	case strings.HasPrefix(r.URL.Path, "/api"):
-		handleApi(w, r)
+		// handleApi(w, r)
+		handleRequestApi(w, r)
 	case r.URL.Path == "/header" || r.URL.Path == "/header/" || r.URL.Path == "/headers" || r.URL.Path == "/headers/":
 		handleSHowHeaders(w, r)
+	//	以/rrequest开头的地址
+	case strings.HasPrefix(r.URL.Path, "/request"):
+		handleRequestApi(w, r)
 	default:
 		http.Error(w, "Page Not Fount", 404)
 		return

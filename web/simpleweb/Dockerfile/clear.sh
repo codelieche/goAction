@@ -33,4 +33,5 @@ done;
 # 第4步：查看镜像
 docker ps | grep $NAME
 
+#  docker ps | grep simpleweb | awk '{print $1}' | xargs docker rm --force $i
 # docker images | grep simpleweb | awk '{print $3}' | xargs docker rmi
