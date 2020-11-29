@@ -7,7 +7,8 @@ RUN apk add --no-cache curl
 VOLUME /data/
 COPY ./static/ /data/
 
-ENV HOST="0.0.0.0" PORT=8080 DURATION=35 VERSION=1
+ENV HOST="0.0.0.0" PORT=8080 DURATION=35 VERSION=1 \
+ TRACE_HEADERS="X-B3-TraceId,X-B3-ParentSpanId,X-B3-SpanId,X-B3-Sampled"
 EXPOSE $PORT
 COPY ./app /app/app
 

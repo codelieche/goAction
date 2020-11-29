@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -28,6 +29,7 @@ var duration int           // 监控检查通过的时间
 var version int = 1        // 本程序的版本v1  改成用程序控制
 //var version int = 2        // 本程序的版本v2
 //var version int = 3        // 本程序的版本v3
+var TRACE_HEADERS = []string{} // 追踪的头信息
 
 // 首页处理器
 func handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -121,60 +123,108 @@ func parseConfig() (string, int, int, int) {
 	return *host, *port, *duration, *version
 }
 
+func nextRequestExecute(next string, r *http.Request) (int, string) {
+	next = strings.Trim(next, " ")
+
+	statusCode := 200
+	requestBody := ""
+
+	wg := sync.WaitGroup{}
+	lock := sync.Mutex{}
+
+	for _, nextItem := range strings.Split(next, ",") {
+		if next != "" {
+			wg.Add(1)
+			go func(next string, body string) {
+
+				defer wg.Done()
+				nextRequestBody := ""
+				// 判断next的前缀
+				if strings.HasPrefix(next, "/") {
+					next = fmt.Sprintf("http://%s:%d%s", host, port, next)
+				}
+
+				// 需要是http开头
+				if !strings.HasPrefix(next, "http") {
+					// 如果不是/和http开头的就给它加一个http的头
+					next = fmt.Sprintf("http://%s", next)
+					//if next != "" {
+					//	nextRequestBody = fmt.Sprintf("Next: %s", next)
+					//}
+				}
+
+				// 发起http/https请求
+				if next != "" && strings.HasPrefix(next, "http") {
+					// log.Printf("有next的值：%s\n", next)
+					// 发起请求
+					if req, err := http.NewRequest("GET", next, nil); err != nil {
+						nextRequestBody = err.Error()
+						statusCode = 500
+					} else {
+						// 头信息处理, 主要是处理追踪头信息
+						if len(TRACE_HEADERS) == 0 {
+							var traceHeaders = os.Getenv("TRACE_HEADERS")
+							if traceHeaders == "" {
+								traceHeaders = "X-B3-TraceId,X-B3-ParentSpanId,X-B3-SpanId,X-B3-Sampled"
+							}
+							TRACE_HEADERS = strings.Split(traceHeaders, ",")
+						}
+						// 如果需要传递的头信息存在，就加入到新的请求的Header中
+						for _, key := range TRACE_HEADERS {
+							value := r.Header.Get(key)
+							if value != "" {
+								req.Header.Add(key, value)
+							}
+						}
+
+						// 发起请求
+						client := &http.Client{}
+						if response, err := client.Do(req); err != nil {
+							nextRequestBody = err.Error()
+							statusCode = 500
+						} else {
+							defer response.Body.Close()
+
+							// 响应码: 以大的为准，比如开始是200，现在是404，那么设置为404
+							// 如果开始是404，后面出现了500，那么设置为500
+							if response.StatusCode > statusCode {
+								statusCode = response.StatusCode
+							}
+
+							// 读取body的内容
+							if body, err := ioutil.ReadAll(response.Body); err != nil {
+								nextRequestBody = err.Error()
+								statusCode = 500
+							} else {
+								// 设置nextRequestBody
+								nextRequestBody = fmt.Sprintf("\nNext: %s\nStatusCode：%d\nBody: %s\n", next, response.StatusCode, body)
+							}
+						}
+					}
+
+				}
+				// 回写body
+				lock.Lock()
+				requestBody += nextRequestBody
+				lock.Unlock()
+			}(nextItem, requestBody)
+
+		}
+	}
+	// 等待http请求结束
+	wg.Wait()
+	// fmt.Printf("发起请求结束")
+	return statusCode, requestBody
+}
+
 // request: 请求页面
 func handleRequestApi(w http.ResponseWriter, r *http.Request) {
 	// 判断是否有next
 	query := r.URL.Query()
 	next := query.Get("next")
 
-	nextRequestBody := ""
-	statusCode := 200
-	// 判断next的前缀
-	if strings.HasPrefix(next, "/") {
-		next = fmt.Sprintf("http://%s:%d%s", host, port, next)
-	}
-
-	// 需要是http开头
-	if !strings.HasPrefix(next, "http") {
-		if next != "" {
-			nextRequestBody = fmt.Sprintf("Next: %s", next)
-		}
-	}
-
-	// 发起http/https请求
-	if next != "" && strings.HasPrefix(next, "http") {
-		// log.Printf("有next的值：%s\n", next)
-		// 发起请求
-		if req, err := http.NewRequest("GET", next, nil); err != nil {
-			nextRequestBody = err.Error()
-			statusCode = 500
-		} else {
-			// 发起请求
-			client := &http.Client{}
-			if response, err := client.Do(req); err != nil {
-				nextRequestBody = err.Error()
-				statusCode = 500
-			} else {
-				defer response.Body.Close()
-
-				// 响应码: 以大的为准，比如开始是200，现在是404，那么设置为404
-				// 如果开始是404，后面出现了500，那么设置为500
-				if response.StatusCode > statusCode {
-					statusCode = response.StatusCode
-				}
-
-				// 读取body的内容
-				if body, err := ioutil.ReadAll(response.Body); err != nil {
-					nextRequestBody = err.Error()
-					statusCode = 500
-				} else {
-					// 设置nextRequestBody
-					nextRequestBody = fmt.Sprintf("\nNext: %s\nStatusCode：%d\nBody: %s\n", next, response.StatusCode, body)
-				}
-			}
-		}
-
-	}
+	// 发起next的请求执行操作
+	statusCode, nextRequestBody := nextRequestExecute(next, r)
 
 	// 兼容：/api /request的请求，设置个区别
 	prefix := "Api"
