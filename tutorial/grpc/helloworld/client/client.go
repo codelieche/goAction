@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	pb "goAction/tutorial/grpc/helloworld/protos"
+	pb "github.com/codelieche/goAction/tutorial/grpc/helloworld/protos"
 
 	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"

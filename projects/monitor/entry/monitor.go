@@ -1,9 +1,8 @@
 package main
 
 import (
+	"goAction/projects/monitor/core/server"
 	"log"
-
-	"codelieche.com/server"
 )
 
 func main() {

@@ -18,6 +18,6 @@
 .vscode
 .DS_Store
 
-tmp/
+temp/
 /pkg
 /bin
